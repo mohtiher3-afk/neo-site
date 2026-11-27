@@ -8,6 +8,14 @@
   <meta property="og:title" content="NEO — New Music Loading">
   <meta property="og:description" content="Sound. Image. Feeling. Discover the NEO visual archive.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neo-music-official.pages.dev/">
+  <meta property="og:image" content="https://neo-music-official.pages.dev/assets/work-001.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NEO — New Music Loading">
+  <meta name="twitter:description" content="Sound. Image. Feeling. Discover the NEO visual archive.">
+  <meta name="twitter:image" content="https://neo-music-official.pages.dev/assets/work-001.webp">
+  <link rel="icon" type="image/png" href="/assets/neo-logo.png">
+  <link rel="apple-touch-icon" href="/assets/neo-logo.png">
   <title>NEO — New Music Loading</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,6 +132,7 @@
     .visualizer span { display:block; width:3px; height:var(--bar,8px); max-height:31px; border-radius:4px; background:linear-gradient(to top,#858b96,#fff); transform-origin:center; }
     .player-console.is-playing .visualizer { opacity:.9; }
     .player-console.is-playing .visualizer span { animation:equalize .68s ease-in-out infinite alternate; animation-delay:var(--delay,0s); }
+    .player-console.is-playing .visualizer.is-live span { animation:none; transition:height 65ms linear; }
     .player-progress { display:flex; align-items:center; gap:11px; color:rgba(255,255,255,.42); font:9px var(--mono); font-variant-numeric:tabular-nums; }
     .player-progress input,.player-volume input { width:100%; min-width:0; height:3px; margin:0; appearance:none; -webkit-appearance:none; background:linear-gradient(90deg,#f1f1ee 0%,#f1f1ee var(--fill,0%),rgba(255,255,255,.17) var(--fill,0%),rgba(255,255,255,.17) 100%); border-radius:99px; cursor:pointer; }
     .player-progress input::-webkit-slider-thumb,.player-volume input::-webkit-slider-thumb { appearance:none; width:10px; height:10px; border-radius:50%; background:#f6f6f3; box-shadow:0 0 0 4px rgba(255,255,255,.08); }
@@ -137,6 +146,8 @@
     .player-volume { width:100%; display:flex; align-items:center; justify-content:flex-end; gap:10px; color:rgba(255,255,255,.5); }
     .player-volume input { max-width:92px; }
     .player-foot { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:auto; padding-top:10px; color:rgba(255,255,255,.34); font:8px var(--mono); letter-spacing:.14em; text-transform:uppercase; }
+    .player-share { padding:5px 10px; border:1px solid rgba(255,255,255,.16); border-radius:99px; background:transparent; color:rgba(255,255,255,.68); font:8px var(--mono); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:color .2s ease,border-color .2s ease,background .2s ease; }
+    .player-share:hover { color:#fff; border-color:rgba(255,255,255,.48); background:rgba(255,255,255,.06); }
     .playlist-console { padding:clamp(17px,2.3vw,30px); display:flex; flex-direction:column; }
     .playlist-heading { display:flex; justify-content:space-between; align-items:center; gap:14px; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,.10); }
     .playlist-heading h3 { margin:0; color:rgba(255,255,255,.92); font-size:16px; font-weight:500; letter-spacing:-.03em; }
@@ -179,6 +190,13 @@
     .dialog-actions button:disabled { opacity:.48; cursor:wait; }
     .upload-feedback { min-height:18px; margin:12px 0 0; color:rgba(255,255,255,.65); font:9px var(--mono); line-height:1.6; }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .work-dialog { width:min(100% - 28px,640px); max-height:min(90vh,820px); overflow:auto; padding:0; border:1px solid rgba(255,255,255,.18); border-radius:12px; background:linear-gradient(155deg,#17181b,#080808 72%); color:#f4f4f1; box-shadow:0 35px 120px rgba(0,0,0,.8); }
+    .work-dialog::backdrop { background:rgba(0,0,0,.82); backdrop-filter:blur(12px); }
+    .work-dialog-inner { padding:clamp(18px,3.5vw,30px); }
+    .work-dialog-media { width:100%; aspect-ratio:1; max-height:54vh; overflow:hidden; border:1px solid rgba(255,255,255,.12); border-radius:6px; background:#0d0d0e; margin-bottom:20px; }
+    .work-dialog-media img { display:block; width:100%; height:100%; object-fit:cover; }
+    .work-dialog-foot { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .work-dialog-title { margin:0; font-size:clamp(22px,4vw,32px); font-weight:500; letter-spacing:-.05em; text-transform:uppercase; }
 
     @keyframes playerOrbit { to { transform:rotate(360deg); } }
     @keyframes equalize { from { transform:scaleY(.25); opacity:.5; } to { transform:scaleY(1); opacity:1; } }
@@ -408,7 +426,7 @@
             <label class="sr-only" for="player-volume">Volume</label>
             <input id="player-volume" type="range" min="0" max="1" value=".82" step=".01" style="--fill:82%">
           </div>
-          <div class="player-foot"><span>Sound in motion</span><span id="player-track-count">0 TRACKS</span></div>
+          <div class="player-foot"><span>Sound in motion</span><button class="player-share" id="player-share" type="button" aria-label="Share NEO">Share ↗</button><span id="player-track-count">0 TRACKS</span></div>
           <audio id="neo-audio" preload="metadata"></audio>
         </section>
 
@@ -501,6 +519,20 @@
         <div class="dialog-actions"><button id="cancel-track-upload" type="button">Cancel</button><button class="publish-track" id="publish-track" type="submit">Publish track ↗</button></div>
         <p class="upload-feedback" id="upload-feedback" aria-live="polite"></p>
       </form>
+    </div>
+  </dialog>
+
+  <dialog class="work-dialog" id="work-dialog" aria-labelledby="work-dialog-title">
+    <div class="work-dialog-inner">
+      <div class="dialog-top" style="margin-bottom:16px;">
+        <div><p class="dialog-kicker" id="work-dialog-kicker">Visual / 001</p><h2 class="work-dialog-title" id="work-dialog-title">Selected work</h2></div>
+        <button class="dialog-close" id="close-work-dialog" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="work-dialog-media"><img id="work-dialog-img" alt=""></div>
+      <div class="work-dialog-foot">
+        <span style="color:rgba(255,255,255,.45);font:9px var(--mono);letter-spacing:.14em;text-transform:uppercase;">NEO / Visual Archive</span>
+        <a class="button button-primary" id="work-dialog-link" href="https://www.tiktok.com/@neoneo4197" target="_blank" rel="noopener noreferrer">Watch on TikTok <span class="button-arrow">↗</span></a>
+      </div>
     </div>
   </dialog>
 
@@ -708,7 +740,37 @@
         }
       };
 
-      document.getElementById('player-visualizer').innerHTML = Array.from({length:30}, (_, index) => `<span style="--bar:${7 + ((index*13)%22)}px;--delay:${(index%9)*-.075}s"></span>`).join('');
+      const visualizerEl = document.getElementById('player-visualizer');
+      visualizerEl.innerHTML = Array.from({length:30}, (_, index) => `<span style="--bar:${7 + ((index*13)%22)}px;--delay:${(index%9)*-.075}s"></span>`).join('');
+      const visualizerBars = Array.from(visualizerEl.querySelectorAll('span'));
+      let audioCtx = null, analyser = null, freqData = null, vizRaf = 0;
+      const initAudioVisualizer = () => {
+        if (reduceMotion || analyser || !('AudioContext' in window || 'webkitAudioContext' in window)) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new Ctx();
+          const source = audioCtx.createMediaElementSource(audio);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          analyser.smoothingTimeConstant = 0.78;
+          source.connect(analyser);
+          analyser.connect(audioCtx.destination);
+          freqData = new Uint8Array(analyser.frequencyBinCount);
+          visualizerEl.classList.add('is-live');
+        } catch {
+          analyser = null;
+        }
+      };
+      const tickVisualizer = () => {
+        if (!analyser || audio.paused) { vizRaf = 0; return; }
+        analyser.getByteFrequencyData(freqData);
+        for (let i = 0; i < visualizerBars.length; i++) {
+          const val = freqData[i % freqData.length] || 0;
+          visualizerBars[i].style.height = `${Math.round(5 + (val / 255) * 26)}px`;
+        }
+        vizRaf = requestAnimationFrame(tickVisualizer);
+      };
+
       audio.volume = Number(volume.value);
       setRangeFill(volume);
       volume.addEventListener('input', () => { audio.volume = Number(volume.value); setRangeFill(volume); });
@@ -722,8 +784,74 @@
       document.getElementById('player-next').addEventListener('click', () => {
         if (tracks.length) playTrack((activeTrack + 1) % tracks.length);
       });
-      audio.addEventListener('play', () => setPlayerState(true));
-      audio.addEventListener('pause', () => setPlayerState(false));
+      audio.addEventListener('play', () => {
+        setPlayerState(true);
+        initAudioVisualizer();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        if (analyser && !vizRaf) tickVisualizer();
+      });
+      audio.addEventListener('pause', () => {
+        setPlayerState(false);
+        if (vizRaf) { cancelAnimationFrame(vizRaf); vizRaf = 0; }
+      });
+
+      const shareButton = document.getElementById('player-share');
+      if (shareButton) {
+        shareButton.addEventListener('click', async () => {
+          const current = tracks[activeTrack];
+          const shareData = {
+            title: current ? `${current.title} — ${current.artist || 'NEO'}` : 'NEO — New Music Loading',
+            text: current ? `Listen to ${current.title} by ${current.artist || 'NEO'}` : 'Sound · Image · Feeling — NEO',
+            url: window.location.origin + window.location.pathname
+          };
+          if (navigator.share) {
+            try { await navigator.share(shareData); return; } catch {}
+          }
+          try {
+            await navigator.clipboard.writeText(shareData.url);
+            shareButton.textContent = 'Copied ✓';
+            window.setTimeout(() => { shareButton.textContent = 'Share ↗'; }, 1800);
+          } catch {}
+        });
+      }
+
+      document.addEventListener('keydown', event => {
+        const tag = event.target?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.querySelector('dialog[open]')) return;
+        if (event.code === 'Space' && tracks.length) {
+          event.preventDefault();
+          if (activeTrack < 0) playTrack(0);
+          else if (audio.paused) audio.play().catch(() => {});
+          else audio.pause();
+        } else if (event.code === 'ArrowRight' && Number.isFinite(audio.duration) && audio.duration) {
+          audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+        } else if (event.code === 'ArrowLeft' && Number.isFinite(audio.duration) && audio.duration) {
+          audio.currentTime = Math.max(0, audio.currentTime - 5);
+        }
+      });
+
+      const workDialog = document.getElementById('work-dialog');
+      if (workDialog) {
+        const workImg = document.getElementById('work-dialog-img');
+        const workTitle = document.getElementById('work-dialog-title');
+        const workKicker = document.getElementById('work-dialog-kicker');
+        const workLink = document.getElementById('work-dialog-link');
+        document.querySelectorAll('.work-card').forEach(card => {
+          card.addEventListener('click', event => {
+            event.preventDefault();
+            const img = card.querySelector('img');
+            const title = card.querySelector('.work-title');
+            const type = card.querySelector('.work-type');
+            if (img) { workImg.src = img.src; workImg.alt = img.alt; }
+            workTitle.textContent = title ? title.textContent.replace(/\s+/g, ' ').trim() : 'Selected work';
+            workKicker.textContent = type ? type.textContent : 'NEO / Visual';
+            workLink.href = card.href;
+            workDialog.showModal();
+          });
+        });
+        document.getElementById('close-work-dialog').addEventListener('click', () => workDialog.close());
+        workDialog.addEventListener('click', event => { if (event.target === workDialog) workDialog.close(); });
+      }
       audio.addEventListener('timeupdate', () => {
         if (!Number.isFinite(audio.duration) || !audio.duration) return;
         seek.value = String(Math.round((audio.currentTime / audio.duration) * 1000));
