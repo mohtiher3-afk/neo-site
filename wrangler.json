@@ -1,0 +1,19 @@
+{
+  "name": "neo-music-official",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-11-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "neo-music-preview",
+      "database_id": "72c50bd6-5ed9-4661-9b97-3a17117d578c",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "MEDIA",
+      "id": "93f25b7c8e8c4d7d8185475663c044d4"
+    }
+  ]
+}

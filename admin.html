@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>NEO — لوحة التحكم</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050505;
+      --panel: #0d0d0e;
+      --panel-2: #141416;
+      --fg: #f4f4f1;
+      --muted: #909094;
+      --line: rgba(255,255,255,.13);
+      --accent: #f4f4f1;
+      --ok: #7ee2a8;
+      --warn: #f2c76b;
+      --bad: #ff7a7a;
+      --mono: "DM Mono", ui-monospace, monospace;
+      --sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100vh; }
+    button, input { font: inherit; color: inherit; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 80px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+    .brand { font-family: var(--mono); letter-spacing: .32em; font-size: 15px; }
+    .brand small { color: var(--muted); letter-spacing: .08em; font-family: var(--sans); margin-inline-start: 10px; }
+    a { color: var(--fg); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: transparent; cursor: pointer; transition: background .2s, border-color .2s; white-space: nowrap; }
+    .btn:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.3); }
+    .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 600; }
+    .btn.primary:hover { background: #fff; }
+    .btn.danger { color: var(--bad); border-color: rgba(255,122,122,.35); }
+    .btn.small { min-height: 32px; padding: 0 12px; font-size: 13px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+    h2 { font-size: 17px; margin: 0 0 16px; font-weight: 600; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    input[type=text], input[type=password] { width: 100%; min-height: 44px; padding: 0 14px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; outline: none; }
+    input[type=text]:focus, input[type=password]:focus { border-color: rgba(255,255,255,.4); }
+    .feedback { min-height: 22px; font-size: 14px; margin-top: 12px; color: var(--muted); }
+    .feedback.bad { color: var(--bad); } .feedback.ok { color: var(--ok); }
+
+    /* Login */
+    #login { max-width: 420px; margin: 12vh auto 0; }
+    #login p { color: var(--muted); font-size: 14px; line-height: 1.7; margin: 0 0 18px; }
+    #login form { display: grid; gap: 14px; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+    .stat b { display: block; font-family: var(--mono); font-size: 24px; font-weight: 500; margin-top: 4px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .meter { height: 4px; border-radius: 4px; background: rgba(255,255,255,.08); margin-top: 10px; overflow: hidden; }
+    .meter i { display: block; height: 100%; background: var(--fg); width: 0; }
+
+    /* Upload */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 120px; padding: 16px; border: 1px dashed rgba(255,255,255,.25); border-radius: 14px; background: var(--panel-2); text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+    .drop:hover, .drop.over { border-color: var(--fg); background: rgba(255,255,255,.04); }
+    .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop strong { font-size: 14px; font-weight: 600; }
+    .drop small { color: var(--muted); font-size: 12px; direction: ltr; unicode-bidi: plaintext; word-break: break-all; }
+    .drop img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
+    .row-end { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg); margin: 0; cursor: pointer; }
+    .check input { width: 18px; height: 18px; accent-color: #f4f4f1; }
+    .progress { height: 6px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 14px; display: none; }
+    .progress.on { display: block; }
+    .progress i { display: block; height: 100%; width: 0; background: var(--fg); transition: width .15s; }
+
+    /* Tracks */
+    .tracks-head { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 12px; }
+    .tracks-head h2 { margin: 0; }
+    .list { display: grid; gap: 10px; }
+    .track { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+    .thumb { width: 64px; height: 64px; border-radius: 10px; background: var(--panel-2); display: grid; place-items: center; overflow: hidden; color: var(--muted); font-family: var(--mono); font-size: 12px; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .meta { min-width: 0; }
+    .meta .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .meta .a { color: var(--muted); font-size: 14px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-family: var(--mono); }
+    .tag.ok { color: var(--ok); border-color: rgba(126,226,168,.35); }
+    .tag.warn { color: var(--warn); border-color: rgba(242,199,107,.35); }
+    .tag.bad { color: var(--bad); border-color: rgba(255,122,122,.35); }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; max-width: 330px; }
+    .edit { grid-column: 1 / -1; display: none; border-top: 1px solid var(--line); padding-top: 14px; margin-top: 2px; }
+    .track.open .edit { display: block; }
+    .edit .grid2 { margin-bottom: 12px; }
+    .edit .drop { min-height: 84px; }
+    .empty { color: var(--muted); text-align: center; padding: 40px 0; border: 1px dashed var(--line); border-radius: 16px; }
+    audio { width: 100%; margin-top: 10px; height: 36px; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 680px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stats .stat:last-child { grid-column: 1 / -1; }
+      .grid2 { grid-template-columns: 1fr; }
+      .track { grid-template-columns: 52px 1fr; }
+      .thumb { width: 52px; height: 52px; }
+      .actions { grid-column: 1 / -1; justify-content: flex-start; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">NEO<small>لوحة التحكم</small></div>
+      <div style="display:flex; gap:8px">
+        <a class="btn small" href="/" target="_blank" rel="noopener">عرض الموقع ↗</a>
+        <button class="btn small" id="logout" hidden>تسجيل الخروج</button>
+      </div>
+    </header>
+
+    <!-- Login -->
+    <section id="login" class="card">
+      <h2>الدخول إلى لوحة التحكم</h2>
+      <p>أدخل مفتاح المدير (ADMIN_KEY) الذي وضعته في إعدادات مشروع Cloudflare Pages.</p>
+      <form id="login-form">
+        <div>
+          <label for="key">مفتاح المدير</label>
+          <input id="key" type="password" autocomplete="current-password" dir="ltr" required>
+        </div>
+        <button class="btn primary" type="submit">دخول</button>
+      </form>
+      <div class="feedback" id="login-feedback"></div>
+    </section>
+
+    <!-- Dashboard -->
+    <main id="dashboard" hidden>
+      <div class="stats">
+        <div class="stat"><span>الأغاني</span><b id="stat-tracks">0</b></div>
+        <div class="stat"><span>الزوار</span><b id="stat-visitors">0</b></div>
+        <div class="stat"><span>المساحة المستخدمة (مجاناً حتى 1 GB)</span><b id="stat-storage">0 MB</b><div class="meter"><i id="stat-meter"></i></div></div>
+      </div>
+
+      <section class="card">
+        <h2>رفع أغنية جديدة</h2>
+        <form id="upload-form">
+          <div class="grid2" style="margin-bottom:14px">
+            <div><label for="u-title">اسم الأغنية</label><input id="u-title" type="text" maxlength="100" placeholder="يُؤخذ من اسم الملف إن تُرك فارغاً"></div>
+            <div><label for="u-artist">الفنان</label><input id="u-artist" type="text" maxlength="100" value="NEO"></div>
+          </div>
+          <div class="grid2">
+            <div class="drop" data-drop>
+              <input id="u-audio" type="file" accept=".mp3,.m4a,.wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav" required>
+              <strong>ملف الأغنية</strong>
+              <small data-name>MP3 · M4A · WAV — حتى 25 MB</small>
+            </div>
+            <div class="drop" data-drop>
+              <input id="u-cover" type="file" accept="image/png,image/jpeg,image/webp">
+              <img alt="" hidden data-preview>
+              <strong>صورة الغلاف (اختياري)</strong>
+              <small data-name>PNG · JPG · WEBP — حتى 5 MB</small>
+            </div>
+          </div>
+          <div class="row-end">
+            <label class="check"><input id="u-publish" type="checkbox" checked> انشرها فوراً للزوار</label>
+            <button class="btn primary" id="u-submit" type="submit">رفع الأغنية ↑</button>
+          </div>
+          <div class="progress" id="u-progress"><i></i></div>
+          <div class="feedback" id="u-feedback"></div>
+        </form>
+      </section>
+
+      <div class="tracks-head">
+        <h2>الأغاني</h2>
+        <button class="btn small" id="refresh">تحديث</button>
+      </div>
+      <div class="list" id="list"></div>
+    </main>
+  </div>
+
+  <template id="track-tpl">
+    <article class="track">
+      <div class="thumb"></div>
+      <div class="meta">
+        <div class="t"></div>
+        <div class="a"></div>
+        <div class="tags"></div>
+      </div>
+      <div class="actions">
+        <button class="btn small" data-act="play">▶ استماع</button>
+        <button class="btn small" data-act="toggle"></button>
+        <button class="btn small" data-act="edit">تعديل</button>
+        <button class="btn small danger" data-act="delete">حذف</button>
+      </div>
+      <div class="edit">
+        <div class="grid2">
+          <div><label>اسم الأغنية</label><input type="text" maxlength="100" data-f="title"></div>
+          <div><label>الفنان</label><input type="text" maxlength="100" data-f="artist"></div>
+        </div>
+        <div class="grid2">
+          <div class="drop" data-drop>
+            <input type="file" accept=".mp3,.m4a,.wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav" data-f="audio">
+            <strong>استبدال ملف الأغنية</strong><small data-name>اتركه فارغاً للإبقاء على الحالي</small>
+          </div>
+          <div class="drop" data-drop>
+            <input type="file" accept="image/png,image/jpeg,image/webp" data-f="cover">
+            <img alt="" hidden data-preview>
+            <strong>استبدال صورة الغلاف</strong><small data-name>اتركه فارغاً للإبقاء على الحالي</small>
+          </div>
+        </div>
+        <div class="row-end">
+          <label class="check" data-remove-wrap><input type="checkbox" data-f="removeCover"> حذف صورة الغلاف</label>
+          <div style="display:flex; gap:8px">
+            <button class="btn small" data-act="cancel">إلغاء</button>
+            <button class="btn small primary" data-act="save">حفظ التغييرات</button>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+        <div class="feedback" data-feedback></div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+  (() => {
+    const $ = id => document.getElementById(id);
+    const store = {
+      get() { try { return sessionStorage.getItem('neo_admin_key') || ''; } catch { return ''; } },
+      set(v) { try { sessionStorage.setItem('neo_admin_key', v); } catch {} },
+      clear() { try { sessionStorage.removeItem('neo_admin_key'); } catch {} },
+    };
+    let key = store.get();
+    let tracks = [];
+    let player = null;
+
+    // wrapped in LTR isolate marks so "12 MB" doesn't flip inside the RTL layout
+    const mb = bytes => '⁦' + (bytes / 1024 / 1024).toFixed(bytes < 10 * 1024 * 1024 ? 1 : 0) + ' MB⁩';
+    const setFeedback = (node, text, kind = '') => { node.textContent = text; node.className = node.className.replace(/\b(ok|bad)\b/g, '').trim() + (kind ? ' ' + kind : ''); };
+
+    // fetch wrapper that adds the admin key
+    async function api(path, options = {}) {
+      const res = await fetch(path, { ...options, headers: { ...(options.headers || {}), Authorization: `Bearer ${key}` } });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) { logout('المفتاح غير صحيح.'); throw new Error('المفتاح غير صحيح.'); }
+      if (!res.ok) throw new Error(data.error || `حدث خطأ (${res.status})`);
+      return data;
+    }
+
+    // XHR upload so we can show progress
+    function upload(method, path, formData, bar) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, path);
+        xhr.setRequestHeader('Authorization', `Bearer ${key}`);
+        bar.classList.add('on');
+        bar.firstElementChild.style.width = '0';
+        xhr.upload.onprogress = e => { if (e.lengthComputable) bar.firstElementChild.style.width = (e.loaded / e.total * 100) + '%'; };
+        xhr.onload = () => {
+          bar.classList.remove('on');
+          let data = {}; try { data = JSON.parse(xhr.responseText); } catch {}
+          if (xhr.status === 401) { logout('المفتاح غير صحيح.'); return reject(new Error('المفتاح غير صحيح.')); }
+          xhr.status >= 200 && xhr.status < 300 ? resolve(data) : reject(new Error(data.error || `فشل الرفع (${xhr.status})`));
+        };
+        xhr.onerror = () => { bar.classList.remove('on'); reject(new Error('انقطع الاتصال أثناء الرفع.')); };
+        xhr.send(formData);
+      });
+    }
+
+    function showDashboard(on) {
+      $('login').hidden = on;
+      $('dashboard').hidden = !on;
+      $('logout').hidden = !on;
+    }
+    function logout(message = '') {
+      key = ''; store.clear(); showDashboard(false);
+      setFeedback($('login-feedback'), message, message ? 'bad' : '');
+    }
+
+    async function load() {
+      const data = await api('/api/admin/overview');
+      tracks = data.tracks;
+      const s = data.stats;
+      $('stat-tracks').textContent = tracks.length;
+      $('stat-visitors').textContent = Number(s.visitors).toLocaleString('ar');
+      $('stat-storage').textContent = mb(s.usedBytes);
+      $('stat-meter').style.width = Math.min(100, s.usedBytes / s.freeStorageBytes * 100) + '%';
+      render();
+    }
+
+    function render() {
+      const list = $('list');
+      list.innerHTML = '';
+      if (!tracks.length) { list.innerHTML = '<div class="empty">لا توجد أغانٍ بعد. ارفع أول أغنية من الأعلى.</div>'; return; }
+      const tpl = $('track-tpl');
+      tracks.forEach(track => {
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        node.dataset.id = track.id;
+        node.querySelector('.thumb').innerHTML = track.coverUrl ? `<img src="${track.coverUrl}" alt="" loading="lazy">` : 'NEO';
+        node.querySelector('.t').textContent = track.title;
+        node.querySelector('.a').textContent = track.artist;
+        const tags = node.querySelector('.tags');
+        const tag = (text, cls) => { const s = document.createElement('span'); s.className = 'tag ' + cls; s.textContent = text; tags.append(s); };
+        tag(track.published ? 'منشورة' : 'مسودة', track.published ? 'ok' : 'warn');
+        if (track.audioMissing) tag('ملف الصوت مفقود — ارفعه من "تعديل"', 'bad');
+        tag(mb(track.sizeBytes), '');
+        tag(new Date(track.createdAt).toLocaleDateString('ar'), '');
+        node.querySelector('[data-act=toggle]').textContent = track.published ? 'إخفاء' : 'نشر';
+        node.querySelector('[data-act=play]').disabled = track.audioMissing;
+        node.querySelector('[data-f=title]').value = track.title;
+        node.querySelector('[data-f=artist]').value = track.artist;
+        node.querySelector('[data-remove-wrap]').hidden = !track.coverUrl;
+        wireDrops(node);
+        list.append(node);
+      });
+    }
+
+    // show chosen file name / preview inside drop zones
+    function wireDrops(root) {
+      root.querySelectorAll('[data-drop]').forEach(drop => {
+        const input = drop.querySelector('input');
+        const name = drop.querySelector('[data-name]');
+        const preview = drop.querySelector('[data-preview]');
+        const original = name.textContent;
+        input.addEventListener('change', () => {
+          const file = input.files[0];
+          name.textContent = file ? `${file.name} — ${mb(file.size)}` : original;
+          if (preview) {
+            if (file) { preview.src = URL.createObjectURL(file); preview.hidden = false; }
+            else { preview.hidden = true; preview.removeAttribute('src'); }
+          }
+        });
+        input.addEventListener('dragenter', () => drop.classList.add('over'));
+        ['dragleave', 'drop'].forEach(ev => input.addEventListener(ev, () => drop.classList.remove('over')));
+      });
+    }
+    function resetDrops(root) {
+      root.querySelectorAll('[data-drop] input').forEach(input => { input.value = ''; input.dispatchEvent(new Event('change')); });
+    }
+
+    function checkAudio(file) {
+      if (!file) return null;
+      if (!/\.(mp3|m4a|wav)$/i.test(file.name)) return 'الصيغ المدعومة: MP3 أو M4A أو WAV.';
+      if (file.size > 25 * 1024 * 1024) return 'حجم الأغنية يجب ألا يتجاوز 25 MB (حد الخطة المجانية).';
+      return null;
+    }
+    function checkCover(file) {
+      if (!file) return null;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) return 'الغلاف يجب أن يكون PNG أو JPG أو WEBP.';
+      if (file.size > 5 * 1024 * 1024) return 'حجم الغلاف يجب ألا يتجاوز 5 MB.';
+      return null;
+    }
+
+    // ----- Login -----
+    $('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      key = $('key').value.trim();
+      setFeedback($('login-feedback'), 'جارٍ التحقق...');
+      try {
+        await load();
+        store.set(key);
+        $('key').value = '';
+        setFeedback($('login-feedback'), '');
+        showDashboard(true);
+      } catch (err) {
+        if (key) setFeedback($('login-feedback'), err.message, 'bad');
+      }
+    });
+    $('logout').addEventListener('click', () => logout());
+    $('refresh').addEventListener('click', () => load().catch(err => alert(err.message)));
+
+    // ----- Upload -----
+    wireDrops($('upload-form'));
+    $('upload-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const fb = $('u-feedback');
+      const audio = $('u-audio').files[0];
+      const cover = $('u-cover').files[0];
+      const problem = !audio ? 'اختر ملف الأغنية.' : checkAudio(audio) || checkCover(cover);
+      if (problem) return setFeedback(fb, problem, 'bad');
+      const form = new FormData();
+      form.append('title', $('u-title').value.trim());
+      form.append('artist', $('u-artist').value.trim() || 'NEO');
+      form.append('published', $('u-publish').checked ? '1' : '0');
+      form.append('audio', audio);
+      if (cover) form.append('cover', cover);
+      $('u-submit').disabled = true;
+      setFeedback(fb, 'جارٍ رفع الأغنية...');
+      try {
+        await upload('POST', '/api/tracks', form, $('u-progress'));
+        setFeedback(fb, $('u-publish').checked ? 'تم! الأغنية الآن متاحة لكل الزوار.' : 'تم الحفظ كمسودة.', 'ok');
+        $('upload-form').reset();
+        $('u-artist').value = 'NEO';
+        resetDrops($('upload-form'));
+        await load();
+      } catch (err) {
+        setFeedback(fb, err.message, 'bad');
+      } finally {
+        $('u-submit').disabled = false;
+      }
+    });
+
+    // ----- Track actions -----
+    $('list').addEventListener('click', async e => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const node = btn.closest('.track');
+      const track = tracks.find(t => t.id === node.dataset.id);
+      const fb = node.querySelector('[data-feedback]');
+      const act = btn.dataset.act;
+
+      if (act === 'play') {
+        if (player && player.dataset.id === track.id) { player.remove(); player = null; return; }
+        if (player) player.remove();
+        player = document.createElement('audio');
+        player.controls = true; player.autoplay = true; player.src = track.audioUrl; player.dataset.id = track.id;
+        player.style.gridColumn = '1 / -1';
+        node.append(player);
+        return;
+      }
+      if (act === 'edit') { node.classList.toggle('open'); return; }
+      if (act === 'cancel') { node.classList.remove('open'); resetDrops(node); return; }
+
+      if (act === 'toggle') {
+        btn.disabled = true;
+        try { await api(`/api/tracks/${track.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ published: !track.published }) }); await load(); }
+        catch (err) { alert(err.message); btn.disabled = false; }
+        return;
+      }
+
+      if (act === 'delete') {
+        if (!confirm(`حذف "${track.title}" نهائياً؟ لا يمكن التراجع.`)) return;
+        btn.disabled = true;
+        try { await api(`/api/tracks/${track.id}`, { method: 'DELETE' }); await load(); }
+        catch (err) { alert(err.message); btn.disabled = false; }
+        return;
+      }
+
+      if (act === 'save') {
+        const title = node.querySelector('[data-f=title]').value.trim();
+        const artist = node.querySelector('[data-f=artist]').value.trim();
+        const audio = node.querySelector('[data-f=audio]').files[0];
+        const cover = node.querySelector('[data-f=cover]').files[0];
+        const removeCover = node.querySelector('[data-f=removeCover]').checked;
+        if (!title) return setFeedback(fb, 'اسم الأغنية لا يمكن أن يكون فارغاً.', 'bad');
+        const problem = checkAudio(audio) || checkCover(cover);
+        if (problem) return setFeedback(fb, problem, 'bad');
+        btn.disabled = true;
+        setFeedback(fb, 'جارٍ الحفظ...');
+        try {
+          if (title !== track.title || artist !== track.artist) {
+            await api(`/api/tracks/${track.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, artist }) });
+          }
+          if (audio || cover || removeCover) {
+            const form = new FormData();
+            if (audio) form.append('audio', audio);
+            if (cover) form.append('cover', cover);
+            if (removeCover) form.append('removeCover', '1');
+            await upload('PUT', `/api/tracks/${track.id}`, form, node.querySelector('.progress'));
+          }
+          await load();
+        } catch (err) {
+          setFeedback(fb, err.message, 'bad');
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // Auto-login if a key is remembered for this tab
+    if (key) {
+      load().then(() => showDashboard(true)).catch(err => { if (key) { showDashboard(false); setFeedback($('login-feedback'), err.message, 'bad'); } });
+    }
+  })();
+  </script>
+</body>
+</html>
