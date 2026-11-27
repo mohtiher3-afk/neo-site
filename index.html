@@ -490,7 +490,7 @@
           <input id="upload-artist" name="artist" maxlength="80" value="NEO" required>
         </label>
         <label class="upload-field">Audio file
-          <input id="upload-audio" name="audio" type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac,.opus" required>
+          <input id="upload-audio" name="audio" type="file" accept=".mp3,.m4a,.wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav" required>
           <small>MP3, M4A, WAV, AAC, OGG or FLAC · up to 40 MB per track.</small>
         </label>
         <label class="upload-field">Cover artwork <span style="color:rgba(255,255,255,.35)">(optional)</span>
@@ -771,7 +771,7 @@
         const coverFile = document.getElementById('upload-cover').files[0];
         const key = document.getElementById('upload-key').value.trim();
         if (!audioFile || !key) { uploadFeedback.textContent = 'Add the audio file and your private publishing key.'; return; }
-        if (audioFile.size > 40 * 1024 * 1024) { uploadFeedback.textContent = 'Audio files must be 40 MB or smaller.'; return; }
+        if (audioFile.size > 25 * 1024 * 1024) { uploadFeedback.textContent = 'Audio files must be 25 MB or smaller.'; return; }
         if (coverFile && coverFile.size > 5 * 1024 * 1024) { uploadFeedback.textContent = 'Cover artwork must be 5 MB or smaller.'; return; }
         publishButton.disabled = true;
         publishButton.textContent = 'Uploading...';
