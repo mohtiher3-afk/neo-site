@@ -535,13 +535,13 @@
         </label>
         <label class="upload-field">Audio file
           <input id="upload-audio" name="audio" type="file" accept=".mp3,.m4a,.wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav" required>
-          <small>MP3, M4A, WAV, AAC, OGG or FLAC · up to 40 MB per track.</small>
+          <small>MP3, M4A or WAV · up to 25 MB per track.</small>
         </label>
         <label class="upload-field">Cover artwork <span style="color:rgba(255,255,255,.35)">(optional)</span>
           <input id="upload-cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp">
           <small>PNG, JPG or WEBP · up to 5 MB. A square cover works best.</small>
         </label>
-        <p class="dialog-note">Publishing adds the audio and artwork to the NEO archive for every visitor. Cloudflare D1, an R2 bucket and the private publishing key must be connected first.</p>
+        <p class="dialog-note">Publishing adds the audio and artwork to the NEO archive for every visitor. Cloudflare D1, a KV namespace and the private publishing key must be connected first.</p>
         <div class="dialog-actions"><button id="cancel-track-upload" type="button">Cancel</button><button class="publish-track" id="publish-track" type="submit">Publish track ↗</button></div>
         <p class="upload-feedback" id="upload-feedback" aria-live="polite"></p>
       </form>
@@ -984,12 +984,5 @@
     })();
   </script>
 </body>
-    .logo {
-    display: inline-block;
-    will-change: transform;
-    transition: transform 0.07s linear !important;   /* أسرع */
-}
-.logo:hover {
-    transform: scale(1.08);
-}
+</html>
 
