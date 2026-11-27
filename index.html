@@ -100,6 +100,7 @@
     .logo-window { width:100%; position:relative; overflow:hidden; clip-path:inset(0 100% 0 0); animation:logoReveal 1.2s .2s var(--ease) forwards; filter:drop-shadow(0 0 18px rgba(255,255,255,.06)); }
     .logo-window img { display:block; width:100%; height:auto; mix-blend-mode:screen; animation:logoBreath 6s 2.2s ease-in-out infinite; }
     .logo-video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; mix-blend-mode:screen; animation:logoBreath 6s 2.2s ease-in-out infinite; }
+    .logo-window.is-live .logo-static { visibility:hidden; }
     @media (prefers-reduced-motion: reduce) { .logo-video { display:none; } }
     .logo-glint { position:absolute; z-index:2; top:10%; bottom:10%; left:-22%; width:12%; opacity:0; pointer-events:none; background:linear-gradient(90deg,transparent,rgba(255,255,255,.52),transparent); filter:blur(7px); transform:skewX(-18deg); animation:glintSweep 1.4s 1.72s ease-out forwards; }
     .hero-caption { margin-top:clamp(18px,3vh,36px); opacity:0; transform:translateY(18px); animation:riseIn 1s 1.1s var(--ease) forwards; }
@@ -577,6 +578,11 @@
         logoVideo.addEventListener('error', () => logoVideo.remove(), { once: true });
         if (!logoVideo.canPlayType || !logoVideo.canPlayType('video/webm;codecs=vp9')) {
           logoVideo.remove();
+        } else {
+          const liveWindow = logoVideo.closest('.logo-window');
+          const markLive = () => liveWindow && liveWindow.classList.add('is-live');
+          logoVideo.addEventListener('playing', markLive, { once: true });
+          if (logoVideo.readyState >= 3) markLive();
         }
       }
       // Keep publishing controls out of the public experience. Add ?studio=1 to open owner mode.
