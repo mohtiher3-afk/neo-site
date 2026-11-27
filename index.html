@@ -44,8 +44,20 @@
       --ease: cubic-bezier(.22,1,.36,1);
       --mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
       --sans: "Manrope", Arial, sans-serif;
+      --anim-duration: 0.166s; /* ~60fps animation duration */
     }
     * { box-sizing: border-box; }
+/* شعار متحرك يتكيف مع FPS الجهاز */
+.logo {
+    display: inline-block;
+    will-change: transform;
+    transform-origin: center;
+    backface-visibility: hidden;
+    transition: transform var(--anim-duration, 0.25s) ease-out;   /* مدة تتكيف مع FPS */
+}
+.logo:hover {
+    transform: scale(1.1);
+}
     html { scroll-behavior: smooth; background: var(--bg); }
     body { margin: 0; overflow-x: hidden; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
     body::before { content:""; position:fixed; inset:0; z-index:10; pointer-events:none; opacity:.10; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.23'/%3E%3C/svg%3E"); mix-blend-mode:screen; }
@@ -348,7 +360,7 @@
 </head>
 <body>
   <header class="site-header" id="site-header">
-    <a class="header-brand" href="#home" aria-label="NEO home"><img src="/assets/neo-logo.png" alt="NEO"></a>
+    <a class="header-brand" href="#home" aria-label="NEO home"><img class="logo" src="/assets/neo-logo.png" alt="NEO"></a>
     <nav class="header-nav" aria-label="Main navigation">
       <a href="#music">Music</a>
       <a href="#works">Visuals</a>
@@ -551,7 +563,7 @@
   </dialog>
 
   <footer class="site-footer">
-    <a href="#home" class="footer-brand"><img src="/assets/neo-logo.png" alt="NEO"><span>Independent music project</span></a>
+    <a href="#home" class="footer-brand"><img class="logo" src="/assets/neo-logo.png" alt="NEO"><span>Independent music project</span></a>
     <div class="visitor-count" title="Unique browser profiles counted by the website">
       <i class="visitor-dot" aria-hidden="true"></i><span>Visitors</span><strong id="visitor-number" aria-live="polite">—</strong>
     </div>
@@ -972,4 +984,12 @@
     })();
   </script>
 </body>
-</html>
+    .logo {
+    display: inline-block;
+    will-change: transform;
+    transition: transform 0.07s linear !important;   /* أسرع */
+}
+.logo:hover {
+    transform: scale(1.08);
+}
+
