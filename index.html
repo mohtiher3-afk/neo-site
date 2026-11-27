@@ -291,6 +291,9 @@
     .site-footer { width:min(100%,1500px); margin:0 auto; padding:22px clamp(22px,5vw,76px) 28px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:20px; color:rgba(255,255,255,.42); font:9px var(--mono); letter-spacing:.12em; text-transform:uppercase; }
     .footer-brand { display:flex; align-items:center; gap:13px; }
     .footer-brand img { width:48px; filter:brightness(.82); }
+    .social-links { display:flex; align-items:center; gap:16px; }
+    .social-links a { color:rgba(255,255,255,.6); font-size:1.2em; transition:color .2s ease; }
+    .social-links a:hover { color:rgba(255,255,255,.9); }
     .visitor-count { display:flex; align-items:center; gap:9px; white-space:nowrap; }
     .visitor-dot { width:5px; height:5px; border-radius:50%; background:#bfc0c2; box-shadow:0 0 10px rgba(255,255,255,.6); }
     #visitor-number { color:rgba(255,255,255,.8); font-size:11px; }
@@ -568,6 +571,11 @@
       <i class="visitor-dot" aria-hidden="true"></i><span>Visitors</span><strong id="visitor-number" aria-live="polite">—</strong>
     </div>
     <a class="back-top" href="#home">Back to top ↑</a>
+    <div class="social-links">
+      <a href="https://www.tiktok.com/@neoneo4197" target="_blank" rel="noopener noreferrer" title="TikTok" class="social-tiktok">&#x1F3AC;</a>
+      <a href="https://instagram.com/neomusicproject" target="_blank" rel="noopener noreferrer" title="Instagram" class="social-instagram">&#xF0;</a>
+      <a href="https://open.spotify.com/artist/1d1jJZWdmFQdAb3GZphCsg" target="_blank" rel="noopener noreferrer" title="Spotify" class="social-spotify">&#xF8;</a>
+    </div>
   </footer>
 
   <script>
