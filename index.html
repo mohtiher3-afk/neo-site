@@ -156,8 +156,8 @@
     .player-track-title { overflow:hidden; margin:0; color:#f5f5f3; font-size:clamp(20px,2.4vw,31px); font-weight:600; letter-spacing:-.06em; text-overflow:ellipsis; white-space:nowrap; }
     .player-track-artist { margin:5px 0 0; color:var(--muted); font-size:11px; }
     .player-quality { color:rgba(255,255,255,.36); font:9px var(--mono); letter-spacing:.12em; white-space:nowrap; }
-    .visualizer { height:36px; display:flex; align-items:center; justify-content:center; gap:4px; margin:19px 0 8px; opacity:.42; }
-    .visualizer span { display:block; width:3px; height:var(--bar,8px); max-height:31px; border-radius:4px; background:linear-gradient(to top,#858b96,#fff); transform-origin:center; }
+    .visualizer { height:36px; margin:19px 0 8px; position:relative; }
+    .visualizer canvas { display:block; width:100%; height:100%; }
     .player-console.is-playing .visualizer { opacity:.9; }
     .player-console.is-playing .visualizer span { animation:equalize .68s ease-in-out infinite alternate; animation-delay:var(--delay,0s); }
     .player-console.is-playing .visualizer.is-live span { animation:none; transition:height 65ms linear; }
@@ -438,7 +438,7 @@
             </div>
             <span class="player-quality">ORIGINAL AUDIO</span>
           </div>
-          <div class="visualizer" id="player-visualizer" aria-hidden="true"></div>
+          <canvas class="visualizer" id="player-visualizer" aria-label="Waveform visualizer" role="img"></canvas>
           <div class="player-progress">
             <span id="player-current-time">00:00</span>
             <label class="sr-only" for="player-seek">Track progress</label>
@@ -786,15 +786,24 @@
         }
       };
 
-      const visualizerEl = document.getElementById('player-visualizer');
-      visualizerEl.innerHTML = Array.from({length:30}, (_, index) => `<span style="--bar:${7 + ((index*13)%22)}px;--delay:${(index%9)*-.075}s"></span>`).join('');
-      const visualizerBars = Array.from(visualizerEl.querySelectorAll('span'));
+      const visualizerCanvas = document.getElementById('player-visualizer');
+      const visualizerCtx = visualizerCanvas.getContext('2d');
       let audioCtx = null, analyser = null, freqData = null, vizRaf = 0;
+      const resizeVisualizer = () => {
+        visualizerCanvas.width = visualizerCanvas.offsetWidth;
+        visualizerCanvas.height = visualizerCanvas.offsetHeight;
+      };
+      if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (mq.matches) reduceMotion = true;
+        mq.addEventListener('change', e => { reduceMotion = e.matches; });
+      }
       const initAudioVisualizer = () => {
         if (reduceMotion || analyser || !('AudioContext' in window || 'webkitAudioContext' in window)) return;
         try {
           const Ctx = window.AudioContext || window.webkitAudioContext;
           audioCtx = new Ctx();
+          resizeVisualizer();
           const source = audioCtx.createMediaElementSource(audio);
           analyser = audioCtx.createAnalyser();
           analyser.fftSize = 64;
@@ -802,7 +811,7 @@
           source.connect(analyser);
           analyser.connect(audioCtx.destination);
           freqData = new Uint8Array(analyser.frequencyBinCount);
-          visualizerEl.classList.add('is-live');
+          visualizerCanvas.classList.add('is-live');
         } catch {
           analyser = null;
         }
@@ -810,9 +819,15 @@
       const tickVisualizer = () => {
         if (!analyser || audio.paused) { vizRaf = 0; return; }
         analyser.getByteFrequencyData(freqData);
-        for (let i = 0; i < visualizerBars.length; i++) {
-          const val = freqData[i % freqData.length] || 0;
-          visualizerBars[i].style.height = `${Math.round(5 + (val / 255) * 26)}px`;
+        const { width, height } = visualizerCanvas;
+        const barWidth = (width / freqData.length) || 2;
+        const margin = 2;
+        for (let i = 0; i < freqData.length; i++) {
+          const val = freqData[i];
+          const barHeight = Math.round((val / 255) * (height - 4));
+          const x = i * barWidth;
+          visualizerCtx.fillStyle = `rgba(255, 255, 255, ${0.3 + (val / 255) * 0.7})`;
+          visualizerCtx.fillRect(x, height - barHeight, barWidth - margin, barHeight);
         }
         vizRaf = requestAnimationFrame(tickVisualizer);
       };
