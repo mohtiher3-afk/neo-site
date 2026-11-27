@@ -1,0 +1,23 @@
+# Local tool state
+.wrangler/
+
+# Dependencies
+node_modules/
+
+# Cloudflare / Vercel build + deploy output
+.vercel/
+.vercel-tmp/
+dist/
+build/
+
+# Local migration artifacts (one-time D1/KV exports)
+neo-d1.sql
+*.sqlite
+
+# Env
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
