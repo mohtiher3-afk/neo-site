@@ -6,7 +6,7 @@ import {
 const load = (id) => query(`SELECT ${TRACK_COLUMNS} FROM tracks WHERE id = $1`, [id]);
 
 // GET /api/tracks -> public list of published releases (used by the home page)
-export async function GET() {
+export async function GET(req) {
   const missing = checkConfig();
   if (missing) return missing;
   const { rows } = await query(
@@ -14,7 +14,9 @@ export async function GET() {
      ORDER BY created_at DESC LIMIT 200`,
     [Date.now()]
   );
-  return json({ tracks: rows.map(publicTrack) });
+  const etag = `"${rows.length}-${rows.map(r => r.id).join('-') || '0'}"`;
+  if (req.headers.get('if-none-match') === etag) return null;
+  return json({ tracks: rows.map(publicTrack) }, 200, { 'etag': etag });
 }
 
 // POST /api/tracks (admin) -> upload a new track as multipart form data

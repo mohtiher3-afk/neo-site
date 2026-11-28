@@ -3,4 +3,6 @@ Allow: /
 Disallow: /admin.html
 Disallow: /api/
 
-Sitemap: https://neo-music-official.pages.dev/sitemap.xml
+# Sitemap - سيتم التحديث تلقائياً من Vercel
+# للربط مع الدومين الحالي:
+# Sitemap: https://neo-site-flax.vercel.app/sitemap.xml

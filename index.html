@@ -133,7 +133,7 @@
     .music-title span { color:rgba(255,255,255,.35); }
     .music-subtitle { max-width:240px; margin:0 0 4px; color:var(--muted); font-size:12px; line-height:1.8; }
     .music-add[hidden] { display:none !important; }
-    .music-add { display:inline-flex; align-items:center; gap:10px; min-height:42px; padding:0 15px; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:rgba(255,255,255,.035); color:#f4f4f1; font:9px var(--mono); letter-spacing:.13em; text-transform:uppercase; cursor:pointer; transition:background .25s ease,border-color .25s ease,transform .25s var(--ease); white-space:nowrap; }
+    .music-add { display:inline-flex; align-items:center; gap:10px; min-height:42px; padding:0 15px; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:rgba(255,255,255,.035); color:#f4f4f1; font:9px var(--mono); letter-spacing:.13em; text-transform:uppercase; cursor:pointer; text-decoration:none; transition:background .25s ease,border-color .25s ease,transform .25s var(--ease); white-space:nowrap; }
     .music-add:hover { transform:translateY(-2px); border-color:rgba(255,255,255,.65); background:rgba(255,255,255,.09); }
     .music-add .plus { font-size:17px; line-height:0; }
     .music-layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:clamp(14px,2vw,26px); position:relative; z-index:1; }
@@ -419,6 +419,7 @@
         <div class="music-head-right">
           <p class="music-subtitle">The music, in its own space. Listen to the releases and enter the NEO sound.</p>
           <button class="music-add" id="open-track-dialog" type="button" hidden><span class="plus" aria-hidden="true">+</span> Add a track</button>
+          <a class="music-add" id="open-admin" href="/admin.html" target="_blank" rel="noopener noreferrer" hidden><span aria-hidden="true">⚙</span> Control panel</a>
         </div>
       </div>
 
@@ -544,7 +545,7 @@
           <input id="upload-cover" name="cover" type="file" accept="image/png,image/jpeg,image/webp">
           <small>PNG, JPG or WEBP · up to 5 MB. A square cover works best.</small>
         </label>
-        <p class="dialog-note">Publishing adds the audio and artwork to the NEO archive for every visitor. Cloudflare D1, a KV namespace and the private publishing key must be connected first.</p>
+        <p class="dialog-note">Publishing adds the audio and artwork to the NEO archive for every visitor. Vercel Postgres storage must be provisioned first.</p>
         <div class="dialog-actions"><button id="cancel-track-upload" type="button">Cancel</button><button class="publish-track" id="publish-track" type="submit">Publish track ↗</button></div>
         <p class="upload-feedback" id="upload-feedback" aria-live="polite"></p>
       </form>
@@ -598,6 +599,8 @@
       const openTrackButton = document.getElementById('open-track-dialog');
       if (studioMode) {
         openTrackButton.hidden = false;
+        const openAdminLink = document.getElementById('open-admin');
+        if (openAdminLink) openAdminLink.hidden = false;
         const musicLegalNote = document.querySelector('.music-legal');
         if (musicLegalNote) musicLegalNote.hidden = false;
       }
@@ -941,7 +944,7 @@
         }
       });
 
-      // Track publishing dialog — the private key is sent only to the same-origin Pages Function.
+      // Track publishing dialog — the private key is sent only to the same-origin Vercel Function.
       const trackDialog = document.getElementById('track-dialog');
       const trackForm = document.getElementById('track-form');
       const uploadFeedback = document.getElementById('upload-feedback');
@@ -999,7 +1002,7 @@
           uploadFeedback.textContent = 'Published. Your track is now available to every visitor.';
           window.setTimeout(closeTrackDialog, 850);
         } catch (error) {
-          uploadFeedback.textContent = error.message || 'The track could not be published. Check the Cloudflare setup.';
+          uploadFeedback.textContent = error.message || 'The track could not be published. Check the Vercel setup.';
         } finally {
           publishButton.disabled = false;
           publishButton.textContent = 'Publish track ↗';
@@ -1008,14 +1011,14 @@
       loadTrackArchive();
 
 
-      // D1-backed unique visitor count. Gracefully falls back when the database is not configured.
+      // Vercel-backed unique visitor count. Gracefully falls back when the database is not configured.
       const visitorNode = document.getElementById('visitor-number');
       fetch('/api/visitors', { method:'GET', credentials:'same-origin', cache:'no-store' })
         .then(response => { if (!response.ok) throw new Error('counter unavailable'); return response.json(); })
         .then(data => {
           if (Number.isFinite(Number(data.visitors))) visitorNode.textContent = Number(data.visitors).toLocaleString();
         })
-        .catch(() => { visitorNode.textContent = '—'; visitorNode.title = 'Visitor counter appears after the Cloudflare D1 database is connected.'; });
+        .catch(() => { visitorNode.textContent = '—'; visitorNode.title = 'Visitor counter appears after the Vercel database is configured.'; });
     })();
   </script>
 </body>
