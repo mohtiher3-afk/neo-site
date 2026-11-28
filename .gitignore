@@ -21,3 +21,6 @@ neo-d1.sql
 
 # OS / editor
 .DS_Store
+
+.vercel
+.env*
